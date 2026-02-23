@@ -12,6 +12,13 @@ add_executable(server_tests
     $<TARGET_OBJECTS:server_obj>
 )
 
+target_include_directories(server_tests
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
+        $<INSTALL_INTERFACE:include>
+)
+
+
 target_link_libraries(server_tests
     PRIVATE
         common::common
