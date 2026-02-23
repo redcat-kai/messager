@@ -4,4 +4,4 @@
 // example function to test
 int calc(int x, int y);
 
-#endif //CLIENT_H
+#endif  // CLIENT_H

@@ -7,4 +7,4 @@ class Connection {
   void print();
 };
 
-#endif // CONNECTION_H
+#endif  // CONNECTION_H

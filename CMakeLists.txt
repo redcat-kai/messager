@@ -20,3 +20,25 @@ include(ProjectOptions)
 add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)
+
+# formatting CI
+find_program(CLANG_FORMAT clang-format)
+if(CLANG_FORMAT)
+    file(GLOB_RECURSE ALL_CXX_FILES
+        ${CMAKE_SOURCE_DIR}/common/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/common/include/*.h
+        ${CMAKE_SOURCE_DIR}/client/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/client/include/*.h
+        ${CMAKE_SOURCE_DIR}/server/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/server/include/*.h
+    )
+
+    add_custom_target(format
+        COMMAND ${CLANG_FORMAT}
+        -i
+        -style=file
+        ${ALL_CXX_FILES}
+        COMMENT "Running clang-format on all source files"
+    )
+endif()
+

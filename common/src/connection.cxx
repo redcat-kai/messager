@@ -1,4 +1,5 @@
 #include "connection.h"
+
 #include <iostream>
 
 Connection::Connection() {

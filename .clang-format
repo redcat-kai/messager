@@ -1,0 +1,8 @@
+BasedOnStyle: Google
+IndentWidth: 2
+ColumnLimit: 100
+AllowShortFunctionsOnASingleLine: Inline
+SortIncludes: true
+DerivePointerAlignment: false
+PointerAlignment: Left
+ReferenceAlignment: Left # Also recommended for consistency with references

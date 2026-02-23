@@ -4,4 +4,4 @@
 //// simple function for testing
 bool is_even(int x);
 
-#endif //SERVER_H
+#endif  // SERVER_H

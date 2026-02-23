@@ -1,5 +1,8 @@
 build
+debug
 common/build
 server/build
 client/build
 .cache/
+Testing/
+
