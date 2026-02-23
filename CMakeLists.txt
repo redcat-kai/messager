@@ -42,3 +42,8 @@ if(CLANG_FORMAT)
     )
 endif()
 
+# Find clang-tidy
+find_program(CLANG_TIDY clang-tidy)
+if(CLANG_TIDY)
+    message(STATUS "clang-tidy found: ${CLANG_TIDY}")
+endif()
