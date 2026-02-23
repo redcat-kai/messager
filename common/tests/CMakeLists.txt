@@ -8,7 +8,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 add_executable(common_tests
-    test_main.cxx
+    test_connection.cxx
 )
 
 target_link_libraries(common_tests

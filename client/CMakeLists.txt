@@ -24,6 +24,12 @@ target_link_libraries(client_obj
     PUBLIC common::common
 )
 
+target_include_directories(client_obj
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
 target_compile_features(client_obj PUBLIC cxx_std_23)
 
 if(TARGET project_options)
@@ -34,6 +40,12 @@ endif()
 add_executable(client
     main.cxx
     $<TARGET_OBJECTS:client_obj>
+)
+
+target_include_directories(client
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
 )
 
 target_link_libraries(client
