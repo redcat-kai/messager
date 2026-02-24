@@ -10,4 +10,3 @@ TEST(Connection, CanPrint) {
 
   EXPECT_EQ("printing!\n", output);
 }
-

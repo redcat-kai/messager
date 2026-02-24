@@ -1,5 +1,7 @@
-#include "server.h"
+#include <cstdlib>
+
 #include "gtest/gtest.h"
+#include "server.h"
 
 TEST(IsEvenTests, HandlesEven) {
   EXPECT_TRUE(is_even(2));

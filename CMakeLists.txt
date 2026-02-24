@@ -38,10 +38,13 @@ find_program(CLANG_FORMAT clang-format)
 if(CLANG_FORMAT)
     file(GLOB_RECURSE ALL_CXX_FILES
         ${CMAKE_SOURCE_DIR}/common/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/common/tests/*.cxx
         ${CMAKE_SOURCE_DIR}/common/include/*.h
         ${CMAKE_SOURCE_DIR}/client/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/client/tests/*.cxx
         ${CMAKE_SOURCE_DIR}/client/include/*.h
         ${CMAKE_SOURCE_DIR}/server/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/server/tests/*.cxx
         ${CMAKE_SOURCE_DIR}/server/include/*.h
     )
 
@@ -63,6 +66,9 @@ if(CLANG_TIDY_EXE)
         ${CMAKE_SOURCE_DIR}/common/src/*.cxx
         ${CMAKE_SOURCE_DIR}/client/src/*.cxx
         ${CMAKE_SOURCE_DIR}/server/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/common/tests/*.cxx
+        ${CMAKE_SOURCE_DIR}/client/tests/*.cxx
+        ${CMAKE_SOURCE_DIR}/server/tests/*.cxx
     )
 
     add_custom_target(tidy
