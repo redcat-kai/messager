@@ -21,6 +21,18 @@ add_subdirectory(common)
 add_subdirectory(client)
 add_subdirectory(server)
 
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}/client/compile_commands.json
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}/server/compile_commands.json
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compile_commands.json
+        ${CMAKE_SOURCE_DIR}/common/compile_commands.json
+)
+
 # formatting CI
 find_program(CLANG_FORMAT clang-format)
 if(CLANG_FORMAT)
@@ -42,8 +54,26 @@ if(CLANG_FORMAT)
     )
 endif()
 
-# Find clang-tidy
-find_program(CLANG_TIDY clang-tidy)
-if(CLANG_TIDY)
-    message(STATUS "clang-tidy found: ${CLANG_TIDY}")
+find_program(CLANG_TIDY_EXE NAMES clang-tidy)
+
+if(CLANG_TIDY_EXE)
+    message(STATUS "Found clang-tidy: ${CLANG_TIDY_EXE}")
+
+    file(GLOB_RECURSE ALL_CXX_FILES
+        ${CMAKE_SOURCE_DIR}/common/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/client/src/*.cxx
+        ${CMAKE_SOURCE_DIR}/server/src/*.cxx
+    )
+
+    add_custom_target(tidy
+        COMMAND ${CLANG_TIDY_EXE}
+                -p ${CMAKE_BINARY_DIR}
+                -warnings-as-errors=*
+                ${ALL_CXX_FILES}
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Running clang-tidy on all .cxx files"
+        VERBATIM
+    )
+else()
+    message(WARNING "clang-tidy not found")
 endif()
