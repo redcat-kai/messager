@@ -3,18 +3,21 @@
 namespace conn {
 const char* SOCKET_PATH = "/tmp/messager.sock";
 
-void ClientConnection::connect() {
-  sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+std::unique_ptr<IConnection> connect_client(const std::string& path) {
+  int sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
   if (sock_fd < 0) {
     throw std::runtime_error("Could not acquire socket file descriptor");
   }
 
+  sockaddr_un addr{};
   addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, SOCKET_PATH, sizeof(addr.sun_path) - 1);
+  std::snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", path.c_str());
 
   if (::connect(sock_fd, (sockaddr*)&addr, sizeof(addr)) < 0) {
     throw std::runtime_error("Could not connect to socket");
   }
+
+  return std::make_unique<DomainSocketConnection>(sock_fd);
 }
 
 void DomainSocketConnection::send(const std::string& message) {
@@ -22,31 +25,32 @@ void DomainSocketConnection::send(const std::string& message) {
 }
 
 std::string DomainSocketConnection::receive() {
-  char buf[100];
-  ssize_t n = read(sock_fd, buf, sizeof(buf) - 1);
-  if (n > 0) {
-    buf[n] = '\0';
-    return std::string(buf);
-  }
+  char buf[1024];
+  ssize_t n = ::read(sock_fd, buf, sizeof(buf));
 
-  return "";
+  if (n == 0) throw std::runtime_error("peer disconnected");
+  if (n < 0) throw std::runtime_error("read failed");
+
+  return std::string(buf, static_cast<size_t>(n));
 }
 
-ClientConnection::~ClientConnection() {
-  close(sock_fd);
+DomainSocketConnection::~DomainSocketConnection() {
+  if (sock_fd >= 0) close(sock_fd);
 }
 
-void ServerConnection::connect() {
+Server::Server(const std::string& file_path) {
+  socket_path = file_path;
+
   this->server_fd = socket(AF_UNIX, SOCK_STREAM, 0);
   if (this->server_fd < 0) {
     throw std::runtime_error("Could not acquire socket file descriptor");
   }
 
   addr.sun_family = AF_UNIX;
-  strncpy(addr.sun_path, SOCKET_PATH, sizeof(addr.sun_path) - 1);
+  std::snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", socket_path.c_str());
 
   // remove existing socket
-  unlink(SOCKET_PATH);
+  unlink(socket_path.c_str());
 
   if (bind(server_fd, (sockaddr*)&addr, sizeof(addr)) < 0) {
     throw std::runtime_error("Could not bind to socket");
@@ -55,16 +59,19 @@ void ServerConnection::connect() {
   if (listen(server_fd, 5) < 0) {
     throw std::runtime_error("Could not listen to socket");
   }
-
-  sock_fd = accept(server_fd, nullptr, nullptr);
-  if (sock_fd < 0) {
-    throw std::runtime_error("Accept on socket failed");
-  }
 }
 
-ServerConnection::~ServerConnection() {
-  close(sock_fd);
+std::unique_ptr<IConnection> Server::accept() {
+  int client_fd = ::accept(server_fd, nullptr, nullptr);
+  if (client_fd < 0) {
+    throw std::runtime_error("Accept on socket failed");
+  }
+
+  return std::make_unique<DomainSocketConnection>(client_fd);
+}
+
+Server::~Server() {
   close(server_fd);
-  unlink(SOCKET_PATH);
+  unlink(socket_path.c_str());
 }
 };  // namespace conn
